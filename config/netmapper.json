@@ -1,0 +1,8 @@
+{
+  "database_path": "/app/data/device_mappings.db",
+  "credentials_path": "/app/data/credentials.json",
+  "use_encryption": true,
+  "cleanup_days": 2500,
+  "polling_interval": 3600,
+  "export_path": "/app/data/exports"
+}

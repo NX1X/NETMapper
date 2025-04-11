@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NETMapper - Network Device Tracker</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="css/styles.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container-fluid">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#" data-bs-target="dashboard">
+                    <i class="bi bi-diagram-3-fill me-2"></i>
+                    NETMapper
+                </a>                          
+                <a href="https://github.com/NX1X/NETMapper" target="_blank" class="navbar-text ms-2 d-none d-md-inline">
+                    <i class="bi bi-github me-1"></i>
+                    NETMapper on GitHub
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#" data-bs-target="dashboard">Dashboard</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-bs-target="devices">Devices</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-bs-target="credentials">Credentials</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-bs-target="settings">Settings</a>
+                        </li>
+                    </ul>
+                    <div class="d-flex">
+                        <button id="poll-all-btn" class="btn btn-success me-2">
+                            <i class="bi bi-arrow-repeat me-1"></i> Poll All Switches
+                        </button>
+                        <button id="export-btn" class="btn btn-outline-light">
+                            <i class="bi bi-download me-1"></i> Export
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Dashboard Tab -->
+        <div class="content-section active" id="dashboard">
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <h2 class="mb-4">Dashboard</h2>
+                    
+                    <!-- Beta Partner Banner -->
+                    <div class="alert alert-info beta-partner-banner mb-4">
+                        <div class="row align-items-center">
+                            <div class="col-md-2 text-center">
+                                <a href="https://bgu.ac.il" target="_blank">
+                                    <img src="./img/bgu-logo.png" alt="Ben Gurion University Logo" class="img-fluid beta-partner-logo" onerror="this.onerror=null; this.src='https://in.bgu.ac.il/marketing/graphics/BGU-Logo-Files/BGU-Logo-En-Color.png';">
+                                </a>
+                            </div>
+                            <div class="col-md-10">
+                                <h5 class="mb-1">Official Beta Testing Partner</h5>
+                                <p class="mb-2">
+                                    <strong>Ben Gurion University of the Negev</strong> is supporting and participating in the beta testing of NETMapper. 
+                                    We extend our gratitude to their IT department for their valuable feedback and support.
+                                    <a href="https://bgu.ac.il" target="_blank" class="ms-2"><i class="bi bi-box-arrow-up-right"></i> bgu.ac.il</a>
+                                </p>
+                                <p class="mb-0">
+                                    <strong>Want to participate in our beta program?</strong> 
+                                    Organizations interested in supporting or participating in this beta are welcome to 
+                                    <a href="mailto:support@nx1xlab.dev?subject=NETMapper%20Beta%20Participation" class="text-decoration-underline">contact me</a> 
+                                    for more information.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Support Development Banner -->
+                    <div class="alert alert-warning support-banner mb-4">
+                        <div class="row align-items-center">
+                            <div class="col-md-9">
+                                <h5 class="mb-1"><i class="bi bi-heart-fill text-danger me-2"></i> Support NETMapper Development</h5>
+                                <p class="mb-0">
+                                    NETMapper is provided free for everyone. If you find it valuable, please consider supporting its continued development.
+                                    Your donations help fund new features, improvements, and ongoing maintenance.
+                                </p>
+                            </div>
+                            <div class="col-md-3 text-end">
+                                <a href="https://buymeacoffee.com/nx1x" target="_blank" class="btn btn-warning">
+                                    <i class="bi bi-cup-hot-fill me-2"></i> Buy Me a Coffee
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Stats Cards Row -->
+                    <div class="row stats-row">
+                        <div class="col-md-2">
+                            <div class="card stats-card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Devices</h5>
+                                    <h2 id="total-devices">-</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="card stats-card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Switches</h5>
+                                    <h2 id="total-switches">-</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card stats-card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Latest Update</h5>
+                                    <h5 id="latest-update">-</h5>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card stats-card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Oldest Record</h5>
+                                    <h5 id="oldest-record">-</h5>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="card stats-card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Updates (24h)</h5>
+                                    <h2 id="recent-updates">-</h2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Devices Table -->
+                    <div class="card mt-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">Recent Device Updates</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>MAC Address</th>
+                                            <th>IP Address</th>
+                                            <th>VLAN</th>
+                                            <th>Switch</th>
+                                            <th>Port</th>
+                                            <th>Last Seen</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="recent-devices-table">
+                                        <tr>
+                                            <td colspan="6" class="text-center">Loading data...</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- VLAN Distribution Card -->
+                    <div class="card mt-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">VLAN Distribution</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="vlan-chart" style="height: 300px;"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Beta Program Card -->
+                    <div class="card mt-4 beta-program-card">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    <h4 class="mb-3">Join Our Beta Program!</h4>
+                                    <p>
+                                        NETMapper is currently in beta testing with Ben Gurion University and select organizations.
+                                        We're looking for additional partners who want early access to this secure network mapping tool.
+                                    </p>
+                                    <ul>
+                                        <li>Get early access to new features</li>
+                                        <li>Influence the product roadmap</li>
+                                        <li>Receive dedicated support</li>
+                                        <li>No cost for beta participants</li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-4 text-center">
+                                    <a href="mailto:support@nx1xlab.dev?subject=NETMapper%20Beta%20Participation%20Request" class="btn btn-primary btn-lg">
+                                        <i class="bi bi-rocket-takeoff me-2"></i> Request Beta Access
+                                    </a>
+                                    <p class="mt-2 text-muted small">
+                                        <i class="bi bi-info-circle me-1"></i> Limited spots available
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Devices Tab -->
+        <div class="content-section" id="devices">
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <h2 class="mb-4">Device Mapping</h2>
+                    
+                    <!-- Search Filters -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">Search Filters</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <label for="mac-filter">MAC Address</label>
+                                        <input type="text" id="mac-filter" class="form-control" placeholder="MAC Address">
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <label for="ip-filter">IP Address</label>
+                                        <input type="text" id="ip-filter" class="form-control" placeholder="IP Address">
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <label for="vlan-filter">VLAN</label>
+                                        <input type="text" id="vlan-filter" class="form-control" placeholder="VLAN">
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <label for="switch-filter">Switch</label>
+                                        <input type="text" id="switch-filter" class="form-control" placeholder="Switch Name/IP">
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <label for="port-filter">Port</label>
+                                        <input type="text" id="port-filter" class="form-control" placeholder="Port">
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <label for="days-filter">Days</label>
+                                        <input type="number" id="days-filter" class="form-control" placeholder="30" value="30">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mt-3">
+                                <div class="col-md-12 text-end">
+                                    <button id="search-btn" class="btn btn-primary">
+                                        <i class="bi bi-search me-1"></i> Search
+                                    </button>
+                                    <button id="clear-btn" class="btn btn-secondary">
+                                        <i class="bi bi-x-circle me-1"></i> Clear
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Results Table -->
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Device Mappings</h5>
+                            <div>
+                                <button id="export-csv-btn" class="btn btn-sm btn-success">
+                                    <i class="bi bi-file-earmark-spreadsheet me-1"></i> Export CSV
+                                </button>
+                                <button id="export-json-btn" class="btn btn-sm btn-info">
+                                    <i class="bi bi-file-earmark-code me-1"></i> Export JSON
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>MAC Address</th>
+                                            <th>IP Address</th>
+                                            <th>VLAN</th>
+                                            <th>Switch</th>
+                                            <th>Port</th>
+                                            <th>First Seen</th>
+                                            <th>Last Seen</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="devices-table">
+                                        <tr>
+                                            <td colspan="7" class="text-center">Use the search filters above to find devices</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <nav aria-label="Device table navigation">
+                                <ul class="pagination justify-content-center" id="pagination">
+                                    <!-- Pagination will be generated dynamically -->
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Credentials Tab -->
+        <div class="content-section" id="credentials">
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <h2 class="mb-4">Switch Credentials</h2>
+                    
+                    <div class="card mb-4">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Manage Credentials</h5>
+                            <div>
+                                <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addCredentialModal">
+                                    <i class="bi bi-plus-circle me-1"></i> Add Switch
+                                </button>
+                                <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#importCredentialsModal">
+                                    <i class="bi bi-file-earmark-arrow-up me-1"></i> Import CSV
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Hostname/IP</th>
+                                            <th>Username</th>
+                                            <th>Port</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="credentials-table">
+                                        <tr>
+                                            <td colspan="5" class="text-center">Loading credentials...</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Tab -->
+        <div class="content-section" id="settings">
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <h2 class="mb-4">System Settings</h2>
+                    
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">General Settings</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="settings-form">
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="use-encryption">
+                                            <label class="form-check-label" for="use-encryption">Enable Database Encryption</label>
+                                        </div>
+                                        <small class="text-muted">
+                                            Note: Changing encryption settings requires restarting the application
+                                        </small>
+                                    </div>
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="cleanup-days" class="form-label">Cleanup Stale Entries (days)</label>
+                                        <input type="number" class="form-control" id="cleanup-days" min="1" max="365" value="30">
+                                        <small class="text-muted">
+                                            Device records older than this many days will be automatically removed
+                                        </small>
+                                    </div>
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="poll-interval" class="form-label">Polling Interval (seconds)</label>
+                                        <input type="number" class="form-control" id="poll-interval" min="300" max="86400" value="3600">
+                                        <small class="text-muted">
+                                            How often the system polls switches in daemon mode (minimum: 5 minutes)
+                                        </small>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="bi bi-save me-1"></i> Save Settings
+                                        </button>
+                                        <button type="button" id="cleanup-btn" class="btn btn-warning ms-2">
+                                            <i class="bi bi-trash me-1"></i> Run Cleanup Now
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">System Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <table class="table table-sm">
+                                        <tbody>
+                                            <tr>
+                                                <th width="200">Database Path:</th>
+                                                <td id="db-path">-</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Credentials Path:</th>
+                                                <td id="cred-path">-</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Encryption Status:</th>
+                                                <td id="encryption-status">-</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Version:</th>
+                                                <td>2.0.2</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Credential Modal -->
+    <div class="modal fade" id="addCredentialModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Switch Credential</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="add-credential-form">
+                        <div class="mb-3">
+                            <label for="switch-name" class="form-label">Switch Name</label>
+                            <input type="text" class="form-control" id="switch-name" placeholder="Core Switch 1">
+                        </div>
+                        <div class="mb-3">
+                            <label for="switch-hostname" class="form-label">Hostname/IP Address</label>
+                            <input type="text" class="form-control" id="switch-hostname" required placeholder="192.168.1.1">
+                        </div>
+                        <div class="mb-3">
+                            <label for="switch-username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="switch-username" required placeholder="admin">
+                        </div>
+                        <div class="mb-3">
+                            <label for="switch-password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="switch-password" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="switch-port" class="form-label">SSH Port</label>
+                            <input type="number" class="form-control" id="switch-port" value="22" min="1" max="65535">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="save-credential-btn">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import Credentials Modal -->
+    <div class="modal fade" id="importCredentialsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Import Credentials from CSV</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="import-credentials-form">
+                        <div class="mb-3">
+                            <label for="csv-file" class="form-label">CSV File</label>
+                            <input type="file" class="form-control" id="csv-file" accept=".csv" required>
+                        </div>
+                        <div class="mb-3">
+                            <p class="mb-1"><strong>CSV Format:</strong></p>
+                            <pre>hostname,username,password,name(optional),port(optional)</pre>
+                            <p class="mb-0 text-muted small">Example: 192.168.1.1,admin,password123,Core Switch,22</p>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="import-csv-btn">Import</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Export Modal -->
+    <div class="modal fade" id="exportModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Export Device Data</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="export-form">
+                        <div class="mb-3">
+                            <label class="form-label">Export Format</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="exportFormat" id="export-csv" value="csv" checked>
+                                <label class="form-check-label" for="export-csv">
+                                    CSV (Comma Separated Values)
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="exportFormat" id="export-json" value="json">
+                                <label class="form-check-label" for="export-json">
+                                    JSON (JavaScript Object Notation)
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Include Filters</label>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="use-filters" checked>
+                                <label class="form-check-label" for="use-filters">
+                                    Apply current search filters to export
+                                </label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="start-export-btn">Export</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alert Toast -->
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+        <div id="alert-toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <strong class="me-auto" id="toast-title">Notification</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body" id="toast-message">
+                Message goes here
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div id="loading-overlay" class="d-none">
+        <div class="spinner-border text-light" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer mt-5 py-3 bg-light">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h5>NETMapper</h5>
+                    <p class="text-muted">Network Device Location Tracker</p>
+                    <p>
+                        <a href="https://github.com/NX1X/NETMapper" class="text-decoration-none" target="_blank">
+                            <i class="bi bi-github me-1"></i> github.com/NX1X/NETMapper
+                        </a>
+                    </p>
+                </div>
+                <div class="col-md-4">
+                    <h5>Contact</h5>
+                    <p>
+                        <a href="mailto:support@nx1xlab.dev" class="text-decoration-none">
+                            <i class="bi bi-envelope me-1"></i> support@nx1xlab.dev
+                        </a>
+                    </p>
+                    <p>
+                        <a href="https://www.linkedin.com/in/edenporat/" class="text-decoration-none" target="_blank">
+                            <i class="bi bi-linkedin me-1"></i> linkedin.com/in/edenporat
+                        </a>
+                    </p>
+                    <div class="d-flex mt-3">
+                        <a href="mailto:support@nx1xlab.dev?subject=NETMapper%20Feature%20Request" class="btn btn-outline-primary btn-sm me-2">
+                            <i class="bi bi-lightbulb me-1"></i> Request a Feature
+                        </a>
+                        <a href="mailto:support@nx1xlab.dev?subject=NETMapper%20Beta%20Participation%20Request" class="btn btn-outline-success btn-sm">
+                            <i class="bi bi-rocket-takeoff me-1"></i> Join Beta
+                        </a>
+                    </div>
+                    <div class="mt-3">
+                        <a href="https://buymeacoffee.com/nx1x" target="_blank" class="btn btn-warning btn-sm">
+                            <i class="bi bi-cup-hot me-1"></i> Support Development
+                        </a>
+                    </div>
+                    <p class="small text-muted mt-2">
+                        Contact me via email or LinkedIn for feature requests, beta participation, support, or collaboration.
+                    </p>
+                </div>
+                <div class="col-md-4">
+                    <h5>About</h5>
+                    <p class="small text-muted">
+                        NETMapper is a secure network device tracking tool that uses SSH 
+                        to map devices across your network infrastructure.
+                    </p>
+                    <p class="small d-flex align-items-center">
+                        <span>Beta Testing Partner:</span>
+                        <a href="https://bgu.ac.il" target="_blank" class="ms-2">
+                            <img src="./img/bgu-logo.png" alt="BGU" class="img-fluid footer-logo" onerror="this.onerror=null; this.src='https://in.bgu.ac.il/marketing/graphics/BGU-Logo-Files/BGU-Logo-En-Color.png';">
+                        </a>
+                    </p>
+                    <p class="small mt-2">
+                        <strong>License:</strong> Free to use for any purpose. Modification and copying of code prohibited.
+                        <a href="mailto:support@nx1xlab.dev?subject=NETMapper%20License%20Inquiry" class="text-decoration-underline">Contact for permissions</a>
+                    </p>
+                    <p class="small">
+                        <a href="https://buymeacoffee.com/nx1x" target="_blank" class="text-decoration-none">
+                            <i class="bi bi-cup-hot me-1"></i> Support this project
+                        </a>
+                    </p>
+                    <p class="small">&copy; 2025 NX1X. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.1.2/dist/chart.umd.min.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

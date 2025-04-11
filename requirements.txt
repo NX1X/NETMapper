@@ -1,0 +1,10 @@
+# Network tools
+paramiko>=2.11.0      # For SSH connections
+flask>=2.2.5          # For API
+flask-cors>=3.0.10    # For API CORS support
+cryptography>=39.0.0  # For encryption
+
+# Testing tools
+pytest>=7.3.1
+pytest-cov>=4.1.0
+pytest-mock>=3.10.0
